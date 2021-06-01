@@ -14,10 +14,13 @@
                 <label>Display name</label>
                 <input type="text" name="username" placeholder="Display name" required>
                 <label>Room</label>
-                <input type="text" name="room" placeholder="Room" required>
+                <input type="text" name="room" placeholder="Room" list="activeRoom" autocomplete="off" required>
+                <datalist id="activeRoom"></datalist>
                 <button>Join</button>
             </form>
         </div>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/home.js"></script>
   </body>
 </html>

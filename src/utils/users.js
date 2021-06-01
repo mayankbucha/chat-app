@@ -1,4 +1,5 @@
 const users = []
+const activeRooms = []
 
 const addUser = ({id, username, room}) => {
     // Clean the data
@@ -46,9 +47,34 @@ const getUsersInRoom = (room) => {
     return users.filter((user) => user.room === room)
 }
 
+const addToActiveRoom = (room) => {
+    room = room.trim().toLowerCase() 
+    const idx = activeRooms.findIndex((activerRoom) => activerRoom === room)
+    if(idx === -1) {
+        activeRooms.push(room)
+    }
+    return activeRooms
+}
+
+const removeFromActiveRoom = (room) => {
+    const idx = activeRooms.findIndex((activerRoom) => activerRoom === room)
+    if(idx !== -1) {
+        activeRooms.splice(idx, 1)
+        return activeRooms
+    }
+    return activeRooms
+}
+
+const getActiveRooms = () => {
+    return activeRooms
+}
+
 module.exports = {
     addUser,
     removeUser,
     getUser,
-    getUsersInRoom
+    getUsersInRoom,
+    addToActiveRoom,
+    getActiveRooms,
+    removeFromActiveRoom
 }
