@@ -12,6 +12,9 @@ const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-template').innerHTML  
 const sidebarTeplate = document.querySelector('#sidebar-template').innerHTML
 
+// Array to store message in session storage.
+let messages = []
+
 // Options
 const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
 
@@ -40,17 +43,51 @@ const autoscroll = () => {
 
 socket.on('message', (message) => {
     console.log(message)
+    const localMessages = sessionStorage.getItem("Message")
+    if(message.text === "Welcome!" && localMessages) {
+        messages = JSON.parse(localMessages)
+        renderLocalMessages(JSON.parse(localMessages))
+        return;
+    }
+    else {
+        messages.push(message)
+        sessionStorage.setItem("Message", JSON.stringify(messages))
+    }
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text,
         createdAt: moment(message.createdAt).format('h:mm a')
     })
     $messages.insertAdjacentHTML('beforeend', html)
-    autoscroll()
 })
+
+const renderLocalMessages= (messagesArray) => {
+    messagesArray.forEach((message) => {
+        if(message.url) {
+            const html = Mustache.render(locationTemplate, {
+                username: message.username,
+                url: message.url,
+                createdAt: moment(message.createdAt).format('h:mm a')
+            })
+            $messages.insertAdjacentHTML('beforeend', html)
+        }
+        else {
+            const html = Mustache.render(messageTemplate, {
+                username: message.username,
+                message: message.text,
+                createdAt: moment(message.createdAt).format('h:mm a')
+            })
+            $messages.insertAdjacentHTML('beforeend', html)
+        }
+    })
+    // Srolling to the end of page
+    $messages.scrollTop = $messages.scrollHeight
+}
 
 socket.on('locationMessage', (message) => {
     console.log(message)
+    messages.push(message)
+    sessionStorage.setItem("Message", JSON.stringify(messages))
     const html = Mustache.render(locationTemplate, {
         username: message.username,
         url: message.url,
