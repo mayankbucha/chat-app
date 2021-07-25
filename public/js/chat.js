@@ -53,10 +53,12 @@ socket.on('message', (message) => {
         messages.push(message)
         sessionStorage.setItem("Message", JSON.stringify(messages))
     }
+    Mustache.parse(messageTemplate)
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text,
-        createdAt: moment(message.createdAt).format('h:mm a')
+        createdAt: moment(message.createdAt).format('h:mm a'),
+        timestamp: message.createdAt
     })
     $messages.insertAdjacentHTML('beforeend', html)
 })
@@ -64,18 +66,22 @@ socket.on('message', (message) => {
 const renderLocalMessages= (messagesArray) => {
     messagesArray.forEach((message) => {
         if(message.url) {
+            Mustache.parse(locationTemplate)
             const html = Mustache.render(locationTemplate, {
                 username: message.username,
                 url: message.url,
-                createdAt: moment(message.createdAt).format('h:mm a')
+                createdAt: moment(message.createdAt).format('h:mm a'),
+                timestamp: message.createdAt
             })
             $messages.insertAdjacentHTML('beforeend', html)
         }
         else {
+            Mustache.parse(messageTemplate)
             const html = Mustache.render(messageTemplate, {
                 username: message.username,
                 message: message.text,
-                createdAt: moment(message.createdAt).format('h:mm a')
+                createdAt: moment(message.createdAt).format('h:mm a'),
+                timestamp: message.createdAt
             })
             $messages.insertAdjacentHTML('beforeend', html)
         }
@@ -88,10 +94,12 @@ socket.on('locationMessage', (message) => {
     console.log(message)
     messages.push(message)
     sessionStorage.setItem("Message", JSON.stringify(messages))
+    Mustache.parse(locationTemplate)
     const html = Mustache.render(locationTemplate, {
         username: message.username,
         url: message.url,
-        createdAt: moment(message.createdAt).format('h:mm a')
+        createdAt: moment(message.createdAt).format('h:mm a'),
+        timestamp: message.createdAt
     })
     $messages.insertAdjacentHTML('beforeend', html)
     autoscroll()
@@ -122,6 +130,18 @@ $messageForm.addEventListener('submit', (e) => {
         console.log('Message delivered!')
     })
 })
+
+// Delete message
+$messages.addEventListener('click', (e) => {
+    if(e.target && e.target.className == "message__options") {
+        const timestamp = e.target.getAttribute('data-timestamp')
+        messages = messages.filter((message) => message.createdAt != timestamp)
+        sessionStorage.setItem("Messages", JSON.stringify(messages))
+        $messages.innerHTML = ''
+        renderLocalMessages(messages)
+    }
+})
+
 
 $sendLocationbutton.addEventListener('click', (e) => {
     if(!navigator.geolocation) {

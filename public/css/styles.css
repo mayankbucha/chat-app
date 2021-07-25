@@ -116,6 +116,17 @@ button:disabled {
 
 .message {
     margin-bottom: 16px;   
+    background-color: lightgray;
+    width: fit-content;
+    padding: 0px 10px;
+}
+
+.message:hover .message__options::before {
+    content: '\2807';
+    position: absolute;
+    margin-left: -8px;
+    margin-top: 1px;
+    background-color: lightgray;
 }
 
 .message__name {

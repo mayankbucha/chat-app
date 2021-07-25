@@ -3,7 +3,7 @@
   <head>
     <title>Chat App</title>
     <link rel="icon" href="img/favicon.png" />
-    <link rel="stylesheet" href="css/styles.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
   </head>
 
   <body>
@@ -26,6 +26,7 @@
     <script id="message-template" type="text/html">
       <div class="message">
         <p>
+          <span class="message__options" data-timestamp='{{timestamp}}'></span>
           <span class="message__name">{{username}}</span>
           <span class="message__meta">{{createdAt}}</span>
         </p>
@@ -36,6 +37,7 @@
     <script id="location-template" type="text/html">
       <div class="message">
         <p>
+            <span class="message__options" data-timestamp='{{timestamp}}'></span>
             <span class="message__name">{{username}}</span>
             <span class="message__meta">{{createdAt}}</span>
           </p>
