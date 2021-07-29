@@ -1,11 +1,17 @@
-const socket = io()
+// @ts-ignore
+import socketio from 'socket.io';
+import * as Qs from 'query-string';
+import * as Mustache from 'mustache';
+import moment from 'moment';
+import { Message } from '../../src/utils/data-structure';
+const socket = socketio.io()
 
 // Elements
-const $messageForm = document.querySelector('#message-form')
-const $mesageFormInput = $messageForm.querySelector('input')
-const $messageFormButton = $messageForm.querySelector('button')
-const $sendLocationbutton = document.querySelector('#send-location')
-const $messages = document.querySelector('#messages') 
+const $messageForm: HTMLFormElement = document.querySelector('#message-form')
+const $mesageFormInput: HTMLInputElement = $messageForm.querySelector('input')
+const $messageFormButton: HTMLButtonElement = $messageForm.querySelector('button')
+const $sendLocationbutton: HTMLButtonElement = document.querySelector('#send-location')
+const $messages: HTMLElement = document.querySelector('#messages') 
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML  
@@ -13,14 +19,14 @@ const locationTemplate = document.querySelector('#location-template').innerHTML
 const sidebarTeplate = document.querySelector('#sidebar-template').innerHTML
 
 // Array to store message in session storage.
-let messages = []
+let messages: Message[] = []
 
 // Options
-const {username, room} = Qs.parse(location.search, {ignoreQueryPrefix: true})
+const {username, room} = Qs.parse(location.search)
 
 const autoscroll = () => {
     // New message element
-    const $newMessage = $messages.lastElementChild
+    const $newMessage: HTMLElement = $messages.lastElementChild as HTMLElement;
 
     // Height of the last message
     const newMessageStyles = getComputedStyle($newMessage)
@@ -41,7 +47,7 @@ const autoscroll = () => {
     }
 }
 
-socket.on('message', (message) => {
+socket.on('message', (message: Message) => {
     console.log(message)
     const localMessages = sessionStorage.getItem("Message")
     if(message.text === "Welcome!" && localMessages) {
@@ -63,8 +69,8 @@ socket.on('message', (message) => {
     $messages.insertAdjacentHTML('beforeend', html)
 })
 
-const renderLocalMessages= (messagesArray) => {
-    messagesArray.forEach((message) => {
+const renderLocalMessages= (messagesArray: Message[]) => {
+    messagesArray.forEach((message: Message) => {
         if(message.url) {
             Mustache.parse(locationTemplate)
             const html = Mustache.render(locationTemplate, {
@@ -90,7 +96,7 @@ const renderLocalMessages= (messagesArray) => {
     $messages.scrollTop = $messages.scrollHeight
 }
 
-socket.on('locationMessage', (message) => {
+socket.on('locationMessage', (message: Message) => {
     console.log(message)
     messages.push(message)
     sessionStorage.setItem("Message", JSON.stringify(messages))
@@ -105,7 +111,7 @@ socket.on('locationMessage', (message) => {
     autoscroll()
 })
 
-socket.on('roomData', ({room ,users}) => {
+socket.on('roomData', ({room ,users}: {room: string ,users: string[]}) => {
     const html = Mustache.render(sidebarTeplate, {
         room,
         users
@@ -117,9 +123,9 @@ $messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
     $messageFormButton.setAttribute('disabled', 'disabled')
 
-    const message = e.target.elements.message.value
+    const message = (e.target as HTMLInputElement).value;
     
-    socket.emit('sendMessage', message, (error) => {
+    socket.emit('sendMessage', message, (error: string) => {
         $messageFormButton.removeAttribute('disabled')
         $mesageFormInput.value = ''
         $mesageFormInput.focus()
@@ -132,11 +138,11 @@ $messageForm.addEventListener('submit', (e) => {
 })
 
 // Delete message
-$messages.addEventListener('click', (e) => {
-    if(e.target && e.target.className == "message__options") {
-        const timestamp = e.target.getAttribute('data-timestamp')
-        messages = messages.filter((message) => message.createdAt != timestamp)
-        sessionStorage.setItem("Messages", JSON.stringify(messages))
+$messages.addEventListener('click', (e: MouseEvent) => {
+    if(e.target && (e.target as HTMLElement).className == "message__options") {
+        const timestamp = (e.target as HTMLElement).getAttribute('data-timestamp');
+        messages = messages.filter((message) => message.createdAt != parseInt(timestamp))
+        sessionStorage.setItem("Message", JSON.stringify(messages))
         $messages.innerHTML = ''
         renderLocalMessages(messages)
     }
@@ -159,7 +165,7 @@ $sendLocationbutton.addEventListener('click', (e) => {
     })
 })
 
-socket.emit('join', {username, room}, (error) => {
+socket.emit('join', {username, room}, (error: string) => {
     if(error) {
         alert(error)
         location.href = '/'

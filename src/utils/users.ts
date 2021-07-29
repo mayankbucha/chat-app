@@ -1,7 +1,9 @@
-const users = []
-const activeRooms = []
+import {User} from './data-structure';
 
-const addUser = ({id, username, room}) => {
+const users: User[] = [];
+const activeRooms: string[] = []
+
+export const addUser = ({id, username, room}: {id: string, username: string, room: string}) => {
     // Clean the data
     username = username.trim().toLowerCase()
     room = room.trim().toLowerCase()    
@@ -26,12 +28,12 @@ const addUser = ({id, username, room}) => {
     }
 
     // Store user
-    const user = { id, username, room}
+    const user: User = { id, username, room}
     users.push(user)
     return { user }
 }
 
-const removeUser = (id) => {
+export const removeUser = (id: string) => {
     const index = users.findIndex((user) => user.id === id)
 
     if(index !== -1) {
@@ -39,25 +41,25 @@ const removeUser = (id) => {
     }
 }
 
-const getUser = (id) => {
+export const getUser = (id: string) => {
     return users.find((user) => user.id === id)
 }
 
-const getUsersInRoom = (room) => {
+export const getUsersInRoom = (room: string) => {
     return users.filter((user) => user.room === room)
 }
 
-const addToActiveRoom = (room) => {
+export const addToActiveRoom = (room: string) => {
     room = room.trim().toLowerCase() 
-    const idx = activeRooms.findIndex((activerRoom) => activerRoom === room)
+    const idx: number = activeRooms.findIndex((activerRoom) => activerRoom === room)
     if(idx === -1) {
         activeRooms.push(room)
     }
     return activeRooms
 }
 
-const removeFromActiveRoom = (room) => {
-    const idx = activeRooms.findIndex((activerRoom) => activerRoom === room)
+export const removeFromActiveRoom = (room: string) => {
+    const idx: number = activeRooms.findIndex((activerRoom) => activerRoom === room)
     if(idx !== -1) {
         activeRooms.splice(idx, 1)
         return activeRooms
@@ -65,16 +67,6 @@ const removeFromActiveRoom = (room) => {
     return activeRooms
 }
 
-const getActiveRooms = () => {
+export const getActiveRooms = () => {
     return activeRooms
-}
-
-module.exports = {
-    addUser,
-    removeUser,
-    getUser,
-    getUsersInRoom,
-    addToActiveRoom,
-    getActiveRooms,
-    removeFromActiveRoom
 }
