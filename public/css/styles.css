@@ -121,6 +121,10 @@ button:disabled {
     padding: 0px 10px;
 }
 
+.message_para {
+    position: relative;
+}
+
 .message:hover .message__options::before {
     content: '\2807';
     position: absolute;
